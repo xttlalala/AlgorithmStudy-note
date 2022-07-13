@@ -31,7 +31,7 @@
 % java Test 5 100 200
 ```
 
-<img src="C:\Users\Nancy\Desktop\算法学习\image\QQ图片20220705151918.png" alt="命令行解析" style="zoom:67%;" />
+<img src="..\image\QQ图片20220705151918.png" alt="命令行解析" style="zoom:67%;" />
 
 ````java
 public class Test {
@@ -66,7 +66,7 @@ The average is 5.0  //
 
 在idea的Terminal中运行java程序
 
-![](C:\Users\Nancy\Desktop\算法学习\image\QQ图片20220706104948.png)
+![](..\image\QQ图片20220706104948.png)
 
 ### 重定向与管道
 
