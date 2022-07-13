@@ -66,7 +66,7 @@ The average is 5.0  //
 
 在idea的Terminal中运行java程序
 
-![](..\image\QQ图片20220706104948.png)
+<img src="..\image\QQ图片20220706104948.png" alt="命令行解析"  />
 
 ### 重定向与管道
 
