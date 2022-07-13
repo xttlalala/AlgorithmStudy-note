@@ -1,4 +1,4 @@
-
+![]()
 
 # 第一章 基础
 
@@ -90,3 +90,72 @@ The average is 5.0  //
 % java RandomSeq 1000 100 200 | java Average
 ```
 
+
+
+## 补充：
+
+### 1.初次将文件夹上传到github中
+
+**需求：将note文件夹和image文件夹上传到github上**
+
+1. 在github上创建一个名为StudyNote仓库,并复制仓库地址
+
+<img src="../image/QQ图片20220713114212.png">
+
+2. 本地创建一个Study的空文件夹
+
+<img src="../image/QQ图片20220713115200.png" style="zoom:80%;" />
+
+3. 系统弹出git bash框，输入代码
+
+```bash
+$ git clone https://github.com/xttlalala/StudyNote.git
+```
+
+<img src="../image/QQ图片20220713115800.png" />
+
+在github上创建的库以文件夹的形式（StudyNote）落在Study目录中
+
+4. 将note文件夹和image文件夹复制到StudyNote中
+
+<img src="../image/QQ图片20220713120138.png" />
+
+5. 回到git bash界面，输入以下代码：
+
+```bash
+$ cd StudyNote
+$ git init
+$ git add .
+$ git commit -m "first-commit"
+$ git push
+```
+
+<img src="../image/QQ图片20220713121531.png" alt="QQ图片20220713121531" style="zoom:150%;" />
+
+本地文件夹即可上传到github仓库中。
+
+### 2.修改后再次提交
+
+1. 我对readme.md文件进行了修改
+
+<img src="../image/QQ图片20220713121814.png" alt="QQ图片20220713121814" style="zoom:80%;" />
+
+2. 也可以直接在StudyNote文件夹中进入git bash
+
+<img src="../image/QQ图片20220713122214.png" style="zoom:80%;" />
+
+3. 在git bash中输入命令
+
+```bash
+$ git add .
+$ git commit -m "update"
+$ git push
+```
+
+
+
+<img src="../image/QQ图片20220713122417.png" style="zoom:70%;" />
+
+4. 成功同步到github仓库
+
+<img src="../image/QQ图片20220713122715.png" style="zoom:60%;" />
