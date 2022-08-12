@@ -1,6 +1,6 @@
-![]()
-
 # 第一章 基础
+
+[TOC]
 
 ## 1.1基础编程模型
 
@@ -52,6 +52,28 @@ public class Test {
 
 标准输入流最重要的特点是这些值会在你的程序读取他们之后消失。只要程序读取了一个值，他就不能回退并再次读取它。
 
+```java
+import Tool.StdIn;
+public class Average {
+    public static void main(String[] args) {
+        double sum = 0.0;
+        int cnt = 0;
+        while(!StdIn.isEmpty()){
+            sum += StdIn.readDouble();
+            cnt++;
+        }
+        double avg = sum/cnt;
+        System.out.println("Average is "+avg);
+    }
+}
+```
+
+直接使用idea运行Average
+
+<img src="../image/QQ图片20220812174548.png"  >
+
+在cmd用命令行运行Average
+
 ```
 //用例：计算标准输入的数字的平均值
 %java Average //运行java程序
@@ -67,6 +89,8 @@ The average is 5.0  //
 在idea的Terminal中运行java程序
 
 <img src="..\image\QQ图片20220706104948.png" alt="命令行解析"  />
+
+<img src="..\image\QQ图片20220812174214.png" alt="命令行解析"  />
 
 ### 重定向与管道
 
@@ -89,6 +113,16 @@ The average is 5.0  //
 ```
 % java RandomSeq 1000 100 200 | java Average
 ```
+
+### 1.2数据抽象
+
+* API
+
+我们使用应用程序编程接口（API）来说明抽象数据类型的行为。它将列出所有构造函数和实例方法并简要描述他们的功能。
+
+
+
+------
 
 
 
