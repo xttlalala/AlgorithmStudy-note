@@ -120,6 +120,102 @@ The average is 5.0  //
 
 我们使用应用程序编程接口（API）来说明抽象数据类型的行为。它将列出所有构造函数和实例方法并简要描述他们的功能。
 
+### 1.3背包队列和栈
+
+* 对集合中的对象的表示方式将直接影响各种操作的效率。
+* 泛型和迭代
+* 链表
+
+#### 1.3.1  泛型
+
+在每份API中，类名后的<Item>记号将Item定义为一个类型参数，表示的是用例将会使用的具体数据类型。在创建栈时，用例会提供一种具体的数据类型，我们可以将Item替换为任意引用数据类型。
+
+#### 1.3.2 API
+
+泛型可迭代的基础集合数据结构类型的API
+
+| 背包：一种不支持从中删除元素的集合数据类型，迭代的顺序不确定且与用例无关。 |
+| ------------------------------------------------------------ |
+| pulibc class Bag<Item> implements Iterable<Item>             |
+| Bag()                              创建一个空背包            |
+| void         add(Item item)               添加一个元素       |
+| boolean   isEmpty()                        背包是否为空      |
+| int             size()                               背包中的元素数量 |
+
+| 先进先出（FIFO）队列：一种基于先进先出策略的集合类型。保存集合元素相对位置，使他们入队顺序与出对顺序相同。 |
+| ------------------------------------------------------------ |
+| public class Queue<Item> implements Iterable<Item>           |
+| Queue()                              创建空队列              |
+| void          enqueue(Item item)           添加一个元素      |
+| Item          dequeue()                           删除最早添加的元素 |
+| boolean    isEmpty()                            队列是否为空 |
+| int              size()                                   队列中的元素数量 |
+
+| 下压栈：一种基于后进先出策略的集合类型。                     |
+| ------------------------------------------------------------ |
+| public class Stack<Item> implements Iterable<Item>           |
+| Stack()                             创建一个空栈             |
+| void             push(Item item)               添加一个元素  |
+| Item             pop()                                 删除最近添加的元素 |
+| boolean       isEmpty()                          栈是否为空  |
+| int                 size()                                 栈中的元素数量 |
+
+#### 1.3.3 自动装箱
+
+类型参数必须被实例化为**引用类型**，因此Java有一种特殊机制来使泛型代码能够处理原始数据类型。在处理赋值语句、方法的参数和算术或逻辑表达式时，Java对自动在引用类型和对应的原始数据类型之间进行转换。
+
+````java
+Stack<Integer> stack = new Stack<Integer>();
+stack.push(12);               //自动装箱（int=>Integer）
+int i = stack.pop();          //自动拆箱（Integer=>int）
+````
+
+#### 1.3.4 双栈算术表达式求值算法
+
+````java
+import Tool.StdIn;
+import java.util.Stack;
+public class Evaluate {
+    public static void main(String[] args) {
+        Stack<String> ops = new Stack<String>();
+        Stack<Double> vals = new Stack<Double>();
+        while(!StdIn.isEmpty()){          //读取字符
+            String s = StdIn.readString();//如果是运算符则压入运算符栈
+            if(s.equals("("))             //如果遇到“(”,则忽略
+                ;
+            else if(s.equals("+"))
+                ops.push(s);
+            else if(s.equals("-"))
+                ops.push(s);
+            else if(s.equals("*"))
+                ops.push(s);
+            else if(s.equals("/"))
+                ops.push(s);
+            else if(s.equals("sqrt"))
+                ops.push(s);
+            else if(s.equals(")")){        //如果字符为“）”，弹出运算符和操作数，计算结果并压入栈
+                String op = ops.pop();
+                double v = vals.pop();
+                if(op.equals("+"))
+                    v = vals.pop() + v;
+                else if(op.equals("-"))
+                    v = vals.pop() - v;
+                else if(op.equals("*"))
+                    v = vals.pop() * v;
+                else if(op.equals("/"))
+                    v = vals.pop() / v;
+                else if(op.equals("sqrt"))
+                    v = Math.sqrt(v);
+                vals.push(v);
+            }
+            //如果不是运算符和括号，则压入操作数栈
+            else vals.push(Double.parseDouble(s));
+        }
+        System.out.println(vals.pop());
+    }
+}
+````
+
 
 
 ------
