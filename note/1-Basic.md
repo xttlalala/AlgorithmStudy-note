@@ -14,9 +14,9 @@
 
 使用命令行编译一个名为Test.java的程序
 
-```
-% javac Test.java
-% java Test
+```bash
+javac Test.java
+java Test
 ```
 
 ### 命令行与参数
@@ -25,10 +25,10 @@
 
 使用命令行编译一个有参数的名为Test.java的程序
 
-```
+```bash
 //命令行
-% javac Test.java
-% java Test 5 100 200
+ javac Test.java
+ java Test 5 100 200
 ```
 
 <img src="..\image\QQ图片20220705151918.png" alt="命令行解析" style="zoom:67%;" />
@@ -74,9 +74,9 @@ public class Average {
 
 在cmd用命令行运行Average
 
-```
+```bash
 //用例：计算标准输入的数字的平均值
-%java Average //运行java程序
+java Average //运行java程序
 3             //键盘输入后，回车
 4
 5
@@ -96,22 +96,23 @@ The average is 5.0  //
 
 将标准输出**重定向**到一个文件中:
 
-```
-% java RandomSeq 1000 100 200 > data.txt
+```bash
+java RandomSeq 1000 100 200 > data.txt
 ```
 
 
 
 可以使用**重定向**标准输入以使StdIn从文件中（而不是终端应用程序中）读取数据：
 
-```
-% java Average < data.txt
+```shell
+java Average < data.txt
+
 ```
 
 将一个程序的输出重定向为另一个程序的输入叫做管道：
 
-```
-% java RandomSeq 1000 100 200 | java Average
+```shell
+java RandomSeq 1000 100 200 | java Average
 ```
 
 ### 1.2数据抽象
@@ -134,7 +135,7 @@ The average is 5.0  //
 
 泛型可迭代的基础集合数据结构类型的API
 
-| 背包：一种不支持从中删除元素的集合数据类型，迭代的顺序不确定且与用例无关。 |
+| 背包：一种不支持从中删除元素的集合数据类型，迭代的顺序不确定、且与用例无关。 |
 | ------------------------------------------------------------ |
 | pulibc class Bag<Item> implements Iterable<Item>             |
 | Bag()                              创建一个空背包            |
@@ -170,7 +171,7 @@ stack.push(12);               //自动装箱（int=>Integer）
 int i = stack.pop();          //自动拆箱（Integer=>int）
 ````
 
-#### 1.3.4 双栈算术表达式求值算法
+* 双栈算术表达式求值算法
 
 ````java
 import Tool.StdIn;
@@ -216,7 +217,253 @@ public class Evaluate {
 }
 ````
 
+#### 1.3.4 支持泛型和迭代的栈、队列、背包代码实现
 
+| 数据结构 | 优点                           | 缺点                           |
+| -------- | ------------------------------ | ------------------------------ |
+| 数组     | 通过索引可以直接访问任何元素   | 在初始化时就需要知道元素的数量 |
+| 链表     | 使用的空间大小与元素数量成正比 | 需要通过引用访问任意元素       |
+
+* 基于数组的栈的实现(泛型参数、可调节大小、可逆序遍历)
+
+```java
+import java.util.Iterator;
+
+public class ResizingArrayStack<Item> implements Iterable<Item> {
+    private Item[] a = (Item[]) new Object[1];
+    private int N = 0;
+    public boolean isEmpty(){
+        return N==0;
+    }
+    public int size(){
+        return N;
+    }
+    private void resize(int max){
+        Item[] temp = (Item[]) new Object[max];
+        for(int i=0;i<N;i++){
+            temp[i] = a[i];
+        }
+        a = temp;
+    }
+    public void push(Item item){
+        if(N==a.length){
+            resize(a.length*2);
+        }
+        a[N++] = item;
+    }
+    public Item pop(){
+        if(N>0) {
+            Item item = a[--N];
+            a[N] = null;
+            if(N==a.length/4)
+                resize(a.length/2);
+            return item;
+        }
+        else
+            return null;
+    }
+    public Iterator<Item> iterator(){
+        return new ReverseArrayIterator();
+    }
+    public class ReverseArrayIterator implements Iterator<Item>{
+        private int i = N;
+        public boolean hasNext(){
+            return  i>0;
+        }
+        public Item next(){
+            return a[--i];
+        }
+        public void remove(){}
+    }
+
+    public static void main(String[] args) {
+        ResizingArrayStack<String> s;
+        s = new ResizingArrayStack<String>();
+        s.push("hello");
+        s.push("My");
+        s.push("name");
+        //s.pop();
+        //s.pop();
+        s.push("is");
+        //s.pop();
+        s.push("Lumos");
+        System.out.println(s.size());
+        for(String a:s){
+            System.out.println(a);
+        }
+    }
+}
+
+```
+
+**链表定义** 链表是一种递归的数据结构，他或者为空(null)，或者是含有泛型元素的结点和指向另一条链表的引用。
+
+* 基于链表的栈的实现
+
+```java
+public class LinkedlistStack<Item>  {
+    private Node first;
+    private int N;
+    private class Node{
+        Item item;
+        Node next;
+    }
+    public boolean isEmpty(){
+        return first == null;
+    }
+    public int size(){
+        return  N;
+    }
+    public void push(Item item){
+        Node oldFirst = first;
+        first = new Node();
+        first.item = item;
+        first.next = oldFirst;
+        N++;
+    }
+    public Item pop(){
+        Item item = first.item;
+        first = first.next;
+        N--;
+        return item;
+    }
+    public void write(Node first){
+        for(Node d = first;d!=null;d=d.next){
+            System.out.println(d.item);
+        }
+    }
+    public static void main(String[] args) {
+        LinkedlistStack<String> s;
+        s = new LinkedlistStack<>();
+        s.push("hello");
+        s.push("My");
+        s.push("name");
+        //s.pop();
+        //s.pop();
+        s.push("is");
+       //s.pop();
+        s.push("Lumos");
+        System.out.println(s.size());
+        s.write(s.first);
+//        for(String a:s){
+//           System.out.println(a);
+//        }
+    }
+}
+
+```
+
+* 基于链表的队列实现
+
+```java
+import Tool.StdIn;
+import java.util.Queue;
+
+public class LinkedlistQueue<Item>{
+    private Node first;
+    private Node last;
+    private int N;
+    private class Node{
+        Item item;
+        Node next;
+    }
+    public boolean isEmpty(){
+        return first == null;
+    }
+    public int size(){
+        return N;
+    }
+    public void enqueue(Item item){
+        Node oldLast = last;
+        last = new Node();
+        last.item = item;
+        if(isEmpty())
+            first = last;
+        else
+            oldLast.next = last;
+        N++;
+    }
+    public Item dequeue(){
+        if(!isEmpty()){
+            Item item = first.item;
+            first = first.next;
+            N--;
+            if(first==null){
+                last = null;
+            }
+            return item;
+        }
+        else
+            return null;
+    }
+
+    public static void main(String[] args) {
+        LinkedlistQueue<String> q = new LinkedlistQueue<String>();
+        while(!StdIn.isEmpty()){
+            String item = StdIn.readString();
+            if(!item.equals("-")){
+                q.enqueue(item);
+            }
+            else if(!q.isEmpty())
+                System.out.print(q.dequeue()+" ");
+        }
+        System.out.println("("+q.size()+" left on queue)");
+    }
+}
+
+```
+
+* 支持泛型和迭代基于链表的背包实现
+
+````java
+import java.util.Iterator;
+
+public class LinkedlistBag<Item> implements Iterable<Item> {
+    private Node first;
+    private class Node{
+        Item item;
+        Node next;
+    }
+    public void add(Item item){
+        Node oldFirest = first;
+        first = new Node();
+        first.item = item;
+        first.next = oldFirest;
+    }
+    public Iterator<Item> iterator(){
+        return new LinkedlistIterator();
+    }
+    private class LinkedlistIterator implements Iterator<Item>{
+        private Node current = first;
+        @Override
+        public boolean hasNext() {
+            return current!=null;
+        }
+
+        @Override
+        public Item next() {
+            Item item = current.item;
+            current = current.next;
+            return item;
+        }
+    }
+
+    public static void main(String[] args) {
+        LinkedlistBag<String> bag = new LinkedlistBag<String>();
+        bag.add("My");
+        bag.add("My2");
+        bag.add("My3");
+        bag.add("My4");
+        bag.add("My5");
+        bag.add("My6");
+        bag.add("My7");
+        for(String b:bag){
+            System.out.print(b+" ");
+        }
+    }
+}
+
+````
 
 ------
 
