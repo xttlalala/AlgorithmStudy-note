@@ -143,8 +143,153 @@ public static void sort(Comparable[] a){
     }
 ```
 
-性能:它的运行时间达不到平方级别。
+> 性能:它的运行时间达不到平方级别。
+
+
 
 ## 2.2归并算法
 
-​    递归实现的归并排序是算法设计中分治思想典型应用。                                                                                                
+​    递归实现的归并排序是算法设计中**分治思想**典型应用。         
+
+​    归并：将两个有序的数组归并成一个更大的数组。
+
+```java
+//自顶向下的归并排序
+public class Merge {
+    private static Comparable[] aux;//归并所需的辅助数组
+    public static void sort(Comparable[] a){
+        aux = new Comparable[a.length];
+        sort(a,0,a.length-1);
+    }
+    public static void sort(Comparable[] a,int lo,int hi){
+        if(hi<=lo)
+            return;;
+        int mid = lo+(hi-lo)/2;
+        sort(a,lo,mid);
+        sort(a,mid+1,hi);
+        merge(a, lo, mid, hi);
+    }
+    //原地归并的实现
+    public static void merge(Comparable[] a,int lo,int mid,int hi){
+        int i = lo;
+        int j = mid+1;
+        for(int k=lo;k<=hi;k++){
+            aux[k] = a[k];
+        }
+        for(int k=lo;k<=hi;k++){
+            if(i>mid) a[k] = aux[j++];
+            else if (j>hi) a[k] = aux[i++];
+            else if(less(aux[j],aux[i]))  a[k]=aux[j++];
+            else {a[k]=aux[i++];};
+        }
+    }
+    public static void main(String[] args) {
+        String[] a = StdIn.readAllStrings();
+        sort(a);
+        assert isSorted(a);
+        show(a);
+    }
+}                                                              
+```
+
+> 性能：
+>
+>   优点：任意长度N的数组排序所需时间和NlgN成正比。
+>
+>    缺点：需要和N成正比的额外空间。（将涉及所有元素复制到一个辅助数组中，再把归并的结果放回原数组中）
+
+> 命题F。对于数组长度为N的任意数组，自顶向下的归并排序需要1/2NlgN至NlgN次比较。
+>
+> 命题G。对于数组长度为N的任意数组，自顶向下的归并排序最多需要访问数组6NlgN次。
+
+```java
+//自底向下的归并排序
+public class MergeBU {
+    private static Comparable[] aux;
+    public static void sort(Comparable[] a){
+        int N = a.length;
+        aux = new Comparable[N];
+        for(int sz=1;sz<N;sz=sz*2){
+            for(int lo=0;lo<N-sz;lo+=sz*2){
+                merge(a,lo ,lo+sz-1 , Math.min(lo+2*sz-1, N-1));
+            }
+        }
+    }
+    public static void merge(Comparable[] a,int lo,int mid,int hi){
+        int i = lo;
+        int j = mid+1;
+        for(int k=lo;k<=hi;k++){
+            aux[k] = a[k];
+        }
+        for(int k=lo;k<=hi;k++){
+            if(i>mid) a[k] = aux[j++];
+            else if (j>hi) a[k] = aux[i++];
+            else if(less(aux[j],aux[i]))  a[k]=aux[j++];
+            else {a[k]=aux[i++];};
+        }
+    }
+    public static void main(String[] args) {
+        String[] a = StdIn.readAllStrings();
+        //sort(a);
+        assert isSorted(a);
+        show(a);
+    }
+}
+```
+
+>命题H。对于长度为N的任意数组，自底向上的归并排序需要1/2NlgN至NlgN次比较，最多访问数组6NlgN次。
+
+## 2.3快速排序
+
+快速排序是一个分治的排序算法。它将一个数组分成两个子数组，将两部分独立的排序，**切分(partition)**的位置取决于数组的内容。
+
+该方法的关键在于切分，这个过程使数组满足三个条件：
+
+* 对于某个j，a[j]的位置已经排定；
+* a[lo]到a[j-1]中的所有元素都不大于a[j];
+* a[j+1]到a[hi]中的所有元素都不小于a[j];
+
+```java
+public class Quick {
+    public static void sort(Comparable[] a){
+        StdRandom.shuffle(a);//随机 
+        sort(a, 0, a.length-1);
+    }
+    public static void sort(Comparable[] a,int lo,int hi){
+        if(hi<=lo)
+            return;
+        int j = partition(a, lo, hi);
+        sort(a,lo,j-1);
+        sort(a,j+1,hi);
+    }
+    //快速排序的划分
+    private static int partition(Comparable[] a,int lo,int hi){
+        int i = lo;
+        int j = hi+1;
+        Comparable v = a[lo];
+        while(true){
+            while(less(a[++i],v)) if(i==hi) break;
+            while(less(v,a[--j])) if(j==lo) break;
+            if(i>=j) break;
+            exch(a, i, j);
+        }
+        exch(a, lo, j);
+        return j;
+    }
+    public static void main(String[] args) {
+        String[] a = StdIn.readAllStrings();
+        sort(a);
+        assert isSorted(a);
+        show(a);
+
+    }
+}
+```
+
+> 性能：
+>
+> 快速排序引人注目的特点包括它是原地排序，且将长度为N的数组排序**所需的时间和NlgN成正比**。
+>
+> 潜在的缺点：在切分不平衡时这个程序可能会极其低效。
+
+> 命题L。快速排序最多需要约N²/2次比较，但随机打乱数组可以预防这种情况。
