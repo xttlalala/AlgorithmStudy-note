@@ -49,6 +49,51 @@ public class Example {
 
 ```
 
+* 运行时间
+
+​		我们要评估算法的**性能**。首先，要计算各个排序算法在不同的随机输入下的基本操作(比较、交换、读写数组)的次数。然后，我们用这些数据来估计算法的相对性能。
+
+* 额外的内存使用
+
+​		排序算法的额外内存开销和运行时间是同等重要的。排序算法可以分为两类：除了函数调用所需的栈和固定数目的实例变量之外无需额外内存的原地排序算法，以及需要额外内存空间来存储另一份数组副本的其他排序算法。
+
+* 数据类型
+
+​		上面的排序模版适用于任何实现了Comparable接口的数据类型。
+
+​		Java中封装数字类型的Integer和Double，以及String和其他许多高级数据类型(File、URL)都实现了Comparable接口。
+
+​		在创建自己的数据类型时，我们只要实现Comparable接口就能保证用例代码将其排序。于是，我们需要实现一个 **compareTo()** 方法来定义目标类型对象的自然次序。
+
+```java
+public class Date implements Comparable<Date> {
+    private final int day;
+    private final int month;
+    private final int year;
+
+    public Date(int day, int month, int year) {
+        this.day = day;
+        this.month = month;
+        this.year = year;
+    }
+    @Override
+    public int compareTo(Date that) {
+        if(this.year > that.year) return +1;
+        if(this.year < that.year) return -1;
+        if(this.month > that.month) return +1;
+        if(this.month < that.month) return -1;
+        if(this.day > that.day) return +1;
+        if(this.day < that.day) return -1;
+        return 0;
+    }
+    public String toString(){
+        return month+"/"+day+"/"+year;
+    }
+}
+```
+
+​	**总之，compareTo()实现了我们的主键抽象——他给出了Comparable接口的任意数据类型的对象的大小顺序的定义。**
+
 ### 2.1.2选择排序
 
  **选择排序**： 首先，找到数组中最小的元素，其次将它和数组中第一个元素交换位置。再次，在剩下的元素中找到最小的元素，将它与数组的第二个元素交换位置。如此往复，直到将整个数组排序。
@@ -91,7 +136,7 @@ public static void sort(Comparable[] a){
     }
 ```
 
-​     **倒置**指的是数组中两个顺序颠倒的元素。比如EXAMPLE中有11对倒置：E-A,X-A,X-M,X-P,X-L,X-E,M-L,M-E,P-L,P-E,L-E。如果数组中倒置的数量小于数组大小的某个倍数，那么我们说这个数组是**部分有序**的。
+​		**倒置**指的是数组中两个顺序颠倒的元素。比如EXAMPLE中有11对倒置：E-A,X-A,X-M,X-P,X-L,X-E,M-L,M-E,P-L,P-E,L-E。如果数组中倒置的数量小于数组大小的某个倍数，那么我们说这个数组是**部分有序**的。
 
 部分有序的数组：
 
@@ -115,9 +160,9 @@ public static void sort(Comparable[] a){
 
 ### 2.1.4希尔排序
 
-​      希尔排序是为了加快速度而改进了插入排序，交换不相邻的元素以对数组的局部进行排序，并最终使用插入排序将局部有序的数组进行排序。
+​		希尔排序是基于插入排序的更快速的排序算法。交换不相邻的元素以对数组的局部进行排序（插入排序对大规模乱序数组排序很慢，因为他只会交换相邻的元素，因此元素只能一点一点的从数组的一端到另一端），并最终使用插入排序将局部有序的数组进行排序。
 
-希尔排序的思想是使数组中任意间隔为h的元素都是有序的。
+​		希尔排序的思想是使数组中任意间隔为h的元素都是有序的。
 
 > 递增序列：好的递增序列决定着算法的性能。
 >
@@ -293,3 +338,25 @@ public class Quick {
 > 潜在的缺点：在切分不平衡时这个程序可能会极其低效。
 
 > 命题L。快速排序最多需要约N²/2次比较，但随机打乱数组可以预防这种情况。
+
+
+
+## 2.4优先队列
+
+优先队列是一个抽象数据类型，它表示了一组值和对这些值的操作。
+
+### 2.4.1API
+
+泛型优先队列的API
+
+| public class MaxPQ<Key extends Comparable<Key>>              |
+| ------------------------------------------------------------ |
+| MaxPQ()                                        创建一个优先队列 |
+| MaxPQ(int max)                           创建一个初始容量为max的优先队列 |
+| MaxPQ(Key[] a)                             用a[ ]中的元素创建一个优先队列 |
+| void    insert(Key v)                                  向优先队列中插入一个元素 |
+| Key     max()                                             返回最大元素 |
+| Key     delMax()                                        删除并返回最大元素 |
+| boolean isEmpty()                                    返回队列是否为空 |
+| int       size()                                             返回优先队列中的元素个数 |
+
