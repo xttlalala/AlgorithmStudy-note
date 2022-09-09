@@ -351,8 +351,8 @@ public class Quick {
 
 | public class MaxPQ<Key extends Comparable<Key>>              |
 | ------------------------------------------------------------ |
-| MaxPQ()                                        创建一个优先队列 |
-| MaxPQ(int max)                           创建一个初始容量为max的优先队列 |
+| MaxPQ()                                         创建一个优先队列 |
+| MaxPQ(int max)                            创建一个初始容量为max的优先队列 |
 | MaxPQ(Key[] a)                             用a[ ]中的元素创建一个优先队列 |
 | void    insert(Key v)                                  向优先队列中插入一个元素 |
 | Key     max()                                             返回最大元素 |
@@ -360,3 +360,224 @@ public class Quick {
 | boolean isEmpty()                                    返回队列是否为空 |
 | int       size()                                             返回优先队列中的元素个数 |
 
+### 2.4.2堆的定义
+
+> 定义:当一棵二叉树的每个结点都大于等于它的两个子结点时，它被称为堆有序。
+
+**二叉堆表示法**
+
+​		完全二叉树只用数组，而不需用指针就可以表示。
+
+​		具体方法就是将二叉树的结点按照层级顺序放入数组中，根节点在位置1，它的子节点在位置2和3，而子结点的子结点则分别在位置4、5、6和7，以此类推。
+
+> **定义。** **二叉堆** 是一组能够用堆有序的完全二叉树排序的元素，并在数组中按照层级储存（不使用数组的第一个位置）。
+
+> **命题P。** 一课大小为N的完全二叉树的高度为lgN(向下取整)。
+
+### 2.4.3堆的算法
+
+​		使用有序或无序数组的优先队列的初级实现总是需要线性时间来完成其中的操作，而基于堆的实现能保证我们在对数时间内完成它们。
+
+* 面向最大元素的优先队列
+
+```java
+public class MaxPQ<Key extends Comparable<Key>>{
+    private Key[] pq;
+    private int N = 0;
+    public MaxPQ(int maxN){
+        pq = (Key[]) new Comparable[maxN+1];
+    }
+    public boolean isEmpty(){
+        return N==0;
+    }
+    public int size(){
+        return N;
+    }
+    public void insert(Key v){
+        pq[++N] = v;//不使用pq[0]
+        swim(N);
+    }
+    public Key delMax(){
+        Key max = pq[1];
+        exch(1,N);
+        pq[N] = null;
+        N--;
+        sink(1);
+        return max;
+    }
+    private void swim(int k){
+        while(k>1&&less(k/2,k)){
+            exch(k/2,k);
+            k = k/2;
+        }
+    }
+    private void sink(int k){
+        while(2*k<=N){
+            int j = 2*k;
+            if(j<N&&less(j,j+1)){
+                j++;
+            }
+            if(!less(k,j)) break;;
+            exch(k,j);
+            k=j;
+        }
+    }
+    private boolean less(int i,int j){
+        return pq[i].compareTo(pq[j])<0;
+    }
+    private void exch(int i,int j){
+        Key t = pq[i];
+        pq[i] = pq[j];
+        pq[j] = t;
+    }
+
+    public static void main(String[] args) {
+        int M = Integer.parseInt(args[0]);
+        MaxPQ<Transaction> pq = new MaxPQ<Transaction>(M+1);
+        while (StdIn.hasNextLine()){
+            //为下一行输入创建一个元素并放入优先队列中
+            Transaction t =new Transaction(StdIn.readLine());
+            pq.insert(t);//插入后进行有序化
+            if(pq.size()>M){//有序化后再弹出最大元素（所以应该建立M+2大小的有限序列)
+                pq.delMax();
+            }
+        }
+        Stack<Transaction> stack = new Stack<Transaction>();
+        while (!pq.isEmpty()){
+            stack.push(pq.delMax());
+        }
+        for(Transaction t:stack)
+            System.out.println(t);
+    }
+}
+
+```
+
+* 、面向最小元素的优先队列
+
+```java
+public class MinPQ<Key extends Comparable<Key>> {
+    private Key[] pq;
+    private  int N = 0;
+    public MinPQ(int maxN){
+        pq = (Key[]) new Comparable[maxN+1];
+    }
+    public Key delMin(){
+        Key min = pq[1];
+        exch(1,N);
+        pq[N] = null;
+        N--;
+        sink(1);
+        return min;
+    }
+    private void swim(int k){
+        while(k>1&&less(k,k/2)){
+            exch(k,k/2);
+            k = k/2;
+        }
+    }
+    private void sink(int k){
+        while(2*k<=N){
+            int j = 2*k;
+            if(j<N&&less(j+1,j)){
+                j++;
+            }
+            if(!less(j,k))break;
+            exch(k,j);
+            k = j;
+        }
+    }
+}
+
+```
+
+> 命题Q。对于一个含有N个元素的基于堆的有限序列，**插入元素** 操作只需不超过 ( lgN+1 )次比较，**删除最大元素** 的操作需要不超过 2lgN 次比较。
+
+
+
+关联索引的泛型优先队列的API
+
+| public class IndexMinPQ<Item extends Comparable<Item>>       |
+| ------------------------------------------------------------ |
+| IndexMinPQ(int maxN)             创建一个最大容量为maxN的优先队列，索引的取值范围为0至maxN-1 |
+| void    insert(int k,Item item)               插入一个元素，将它和索引k相关联 |
+| void    change(int k,Item item)             将索引为k的元素设为item |
+| boolean contains(int k)                        是否存在索引为k的元素 |
+| void     delete(int k)                               删去索引k及其相关联的元素 |
+| Item     min()                                          返回最小元素 |
+| int        minIndex()                                 返回最小元素的索引 |
+| int        delMin()                                     删除最小元素并返回它的索引 |
+| boolean isEmpty()                                 优先队列是否为空 |
+| int         size()                                         优先队列中的元素个数 |
+
+### 2.4.5堆排序
+
+#### 2.4.5.1堆的构造
+
+​		在排序的第一阶段，我们的目标是产生一个堆有序的结果。使用sink()我们只需要扫描数组一半的元素，因为我们可以跳过大小为1的子堆。
+
+> **命题R。** 用下沉操作由N个元素构造堆只需少于2N次比较以及少于N次交换。
+
+#### 2.4.5.2下沉排序
+
+​		堆排序的主要工作都是在第二阶段完成的，每次将堆中的最大元素删除(将其与最末元素交换，再N--)。 
+
+​		这个过程和选择排序有些类似，但所需的比较要少得多，因为堆提供了一种从未排序的部分找到最大元素的有效方法。
+
+> **命题S。** 将N个元素排序，堆排序只需少于（2NlgN+2N）次比较，以及一般的交换。
+>
+> 2N项来自堆的构造；2NlgN项来自于每次下沉操作最大可能需要2lgN的比较
+
+```java
+public class Heapsort {
+    public static void sort(Comparable[] a){
+        int N = a.length-1;
+        System.out.println(N);
+        for(int k = N/2;k>=1;k--){
+            sink(a,k,N);
+        }
+        while(N>1){
+            exch(a,N--,1);
+            sink(a,1,N);
+        }
+    }
+    private static void sink(Comparable[] a,int k,int N){
+        while(2*k<=N){
+            int j = 2*k;
+            if(j<N&&less(a,j,j+1)){
+                j++;
+            }
+            if(!less(a,k,j)) break;;
+            exch(a,k,j);
+            k=j;
+        }
+    }
+    private static boolean less(Comparable[] a,int i,int j){
+        return a[i].compareTo(a[j])<0;
+    }
+    private static void exch(Comparable[] a,int i,int j){
+        Comparable t = a[i];
+        a[i] = a[j];
+        a[j] = t;
+    }
+    private static void show(Comparable[] a){
+        for(int i=1;i<a.length;i++)
+            System.out.print(a[i]+" ");
+        System.out.println();
+    }
+    public static void main(String[] args) {
+        String[] a = StdIn.readAllStrings();
+        String[] b = new String[a.length+1];
+        b[0]=null;
+        for(int i=1;i<b.length;i++)
+            b[i]=a[i-1];
+        sort(b);
+        show(b);
+    }
+}
+
+```
+
+​		**堆排序是我们所知的唯一能够同时最优地利用空间和时间的方法——在最坏情况下它也能保证使用~2NlgN次比较和恒定的额外空间** 。
+
+​		它能在**插入操作** 和**删除最大元素操作** 混合的动态场景中保证对数级别的运行时间。
